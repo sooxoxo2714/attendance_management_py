@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>勤務入力 - スタッフ給与管理</title>
+    <style>
+        /* 全体のレイアウト設定 */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: sans-serif;
+            background-color: #7CCEF4;
+            margin: 0;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .main-wrapper {
+            display: flex;
+            width: 95%;
+            max-width: 1000px;
+            gap: 20px;
+            height: 85vh;
+            margin: auto;
+        }
+
+        /* 共通のボックスデザイン */
+        .card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            padding: 25px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 左側：操作パネル */
+        .left-panel {
+            width: 350px;
+            flex-shrink: 0;
+        }
+
+        /* 右側：履歴一覧（縦スクロール対応） */
+        .right-panel {
+            flex-grow: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        /* ボックス内のタイトル */
+        .card-title {
+            text-align: center;
+            color: #333;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+            border-bottom: 2px solid #7CCEF4;
+            padding-bottom: 10px;
+        }
+
+        h3 { margin-top: 0; color: #333; border-bottom: 2px solid #7CCEF4; padding-bottom: 8px; }
+
+        /* フォーム部品 */
+        .input-group { margin-bottom: 15px; width: 100%; display: flex; align-items: center; }
+        .input-group label { width: 60px; font-weight: bold; text-align: left; margin-right: 10px; color: #555; }
+        input {
+            padding: 10px;
+            flex: 1;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            background-color: #f9f9f9;
+        }
+
+        /* ボタンデザイン */
+        .btn-add { width: 100%; padding: 12px; background: #28a745; color: white; border: none; border-radius: 12px; cursor: pointer; font-size: 16px; font-weight: bold; }
+        .btn-update { background: #ffc107; color: #212529; }
+        .btn-back { width: 100%; padding: 12px; background: #6c757d; color: white; border: none; border-radius: 12px; cursor: pointer; font-size: 14px; font-weight: bold; text-decoration: none; text-align: center; display: block; box-sizing: border-box; }
+
+        /* ボックス下部に寄せるためのコンテナ */
+        .bottom-actions {
+            margin-top: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            text-align: center;
+        }
+
+        .month-filter { background: #f0f0f0; padding: 15px; border-radius: 12px; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .month-filter label { font-weight: bold; color: #555; }
+        .month-filter input { max-width: 150px; }
+
+        /* リスト表示 */
+        ul { list-style: none; padding: 0; margin: 0; }
+        li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+            gap: 15px;
+        }
+
+        .actions { display: flex; gap: 10px; flex-shrink: 0; }
+        .btn-edit-link { color: white; background-color: #007bff; text-decoration: none; border: none; padding: 8px 15px; border-radius: 12px; font-size: 14px; font-weight: bold; }
+        .btn-del-rec { color: white; background-color: #e74c3c; text-decoration: none; border: none; padding: 8px 15px; border-radius: 12px; font-size: 14px; font-weight: bold; cursor: pointer; }
+
+        .edit-label { color: #856404; background-color: #fff3cd; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 14px; text-align: center; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="main-wrapper">
+        <div class="left-panel card">
+            <h2 class="card-title">勤務時間入力 - {{ name }}</h2>
+
+            {% if edit_data %}
+                <div class="edit-label">※勤務時間を修正してください。</div>
+            {% endif %}
+
+            <form method="post" style="display: flex; flex-direction: column; height: 100%;">
+                <div class="form-area">
+                    {% if edit_data %}
+                        <input type="hidden" name="rid" value="{{ edit_data[0] }}">
+                    {% endif %}
+
+                    <div class="input-group">
+                        <label>日付</label>
+                        <input type="date" name="date" value="{{ edit_data[2] if edit_data else '' }}" required>
+                    </div>
+                    <div class="input-group">
+                        <label>開始</label>
+                        <input type="time" name="start_time" value="{{ edit_data[3] if edit_data else '' }}" required>
+                    </div>
+                    <div class="input-group">
+                        <label>終了</label>
+                        <input type="time" name="end_time" value="{{ edit_data[4] if edit_data else '' }}" required>
+                    </div>
+
+                    {% if not edit_data %}
+                        <button type="submit" class="btn-add">勤務時間を登録</button>
+                    {% endif %}
+                </div>
+
+                <div class="bottom-actions">
+                    {% if edit_data %}
+                        <button type="submit" class="btn-add btn-update">保存</button>
+                        <a href="?month={{ target_month }}" style="display:block; font-size:14px; color: #888; text-decoration: none;">キャンセル</a>
+                    {% else %}
+                        <a href="/" class="btn-back">← 戻る</a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+
+        <div class="right-panel card">
+            <h3 class="card-title">勤務記録</h3>
+            {% if not edit_data %}
+                <div class="month-filter">
+                    <label>表示月：</label>
+                    <input type="month" value="{{ target_month }}" onchange="location.href='?month='+this.value">
+                </div>
+                {% if records %}
+                    <ul>
+                    {% for r in records %}
+                        <li>
+                            <div>
+                                <div style="font-size:14px;"><strong>{{ r[2] }}</strong></div>
+                                <div style="color: #666;">{{ r[3] }} 〜 {{ r[4] }} ({{ r[5] }}分)</div>
+                            </div>
+                            <div class="actions">
+                                <a href="?month={{ target_month }}&edit_id={{ r[0] }}" class="btn-edit-link">修正</a>
+                                <a href="/delete_record/{{ r[0] }}/{{ eid }}?month={{ target_month }}" class="btn-del-rec" onclick="return confirm('削除しますか？')">削除</a>
+                            </div>
+                        </li>
+                    {% endfor %}
+                    </ul>
+                {% else %}
+                    <p style="color: #888; padding: 20px; text-align: center;">記録はありません。</p>
+                {% endif %}
+            {% else %}
+                <div style="color: #999; text-align: center; margin-top: 100px;">
+                    左側のパネルで勤務時間を修正してください。
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+</body>
+</html>

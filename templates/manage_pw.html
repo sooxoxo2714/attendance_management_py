@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>パスワード変更</title>
+    <style>
+        body { font-family: sans-serif; background-color: #7CCEF4; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 90%; max-width: 350px; text-align: center; }
+        h2 { color: #333; margin-bottom: 20px; font-size: 20px; }
+        input { width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
+        .btn { width: 100%; padding: 12px; background: #007bff; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        .back-link { display: block; margin-top: 15px; color: #666; text-decoration: none; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>パスワード変更</h2>
+        <form action="/update_password" method="post" onsubmit="return confirm('新しいパスワードを保存しますか？\n変更後に自動でログイン画面へリダイレクトされます。')">
+            <input type="text" name="new_password" placeholder="新しいパスワードを入力" required autofocus>
+            <button type="submit" class="btn">更新して保存</button>
+        </form>
+        <a href="/login" class="back-link">キャンセル</a>
+    </div>
+</body>
+</html>

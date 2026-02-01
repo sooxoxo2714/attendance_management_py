@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>データベース管理</title>
+    <style>
+        body { font-family: sans-serif; background-color: #7CCEF4; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; }
+        .container { width: 98%; max-width: 1000px; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 8px 16px rgba(0,0,0,0.1); margin-bottom: 30px; }
+        h1 { font-size: 1.5rem; color: #333; margin: 10px 0 20px; text-align: center; }
+        h2 { font-size: 1rem; text-align: left; color: #555; border-bottom: 2px solid #7CCEF4; padding-bottom: 3px; margin-top: 20px; }
+        .table-wrapper { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 5px; }
+        th, td { border: 1px solid #eee; padding: 6px; font-size: 13px; text-align: left; }
+        th { background: #f9f9f9; }
+        input { padding: 5px; width: 100%; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box; }
+
+        .action-cell {
+            width: 1%;
+            white-space: nowrap;
+            text-align: center;
+            vertical-align: middle;
+            padding: 8px 15px;
+        }
+        .action-col { width: 1px; white-space: nowrap; }
+        .btn-box { display: flex; gap: 4px; }
+        .btn {
+            padding: 10px 17px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: bold;
+            border: none;
+            color: white;
+            margin: 0 auto;
+            line-height: 1;
+        }
+        .action-area { text-align: right; margin-top: 10px; }
+        .btn-update { background: #007bff; }
+        .btn-delete { background: #dc3545; }
+
+        .empty-msg { padding: 10px; color: #999; font-size: 12px; text-align: center; }
+        .back-link { display: block; margin-top: 20px; color: #888; text-decoration: none; font-size: 13px; text-align: center; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>全データベース管理</h1>
+
+    <form action="/update_all_bulk" method="post">
+
+        <h2>従業員 (employees)</h2>
+        <table>
+            <tr><th style="width: 60px;">社員ID</th><th>名前</th><th>操作</th></tr>
+            {% if employees %}
+                {% for e in employees %}
+                <tr>
+                    <td>
+                        {{ e[0] }}
+                        <input type="hidden" name="emp_id_list" value="{{ e[0] }}">
+                    </td>
+                    <td>
+                        <input type="text" name="name_{{ e[0] }}" value="{{ e[1] }}">
+                    </td>
+                    <td class="action-cell">
+                        <button type="button" class="btn btn-delete" onclick="if(confirm('削除しますか？')) { location.href='/delete_direct/employees/{{ e[0] }}'; }">削除</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            {% else %}<tr><td colspan="3" class="empty-msg">このテーブルは空です。</td></tr>{% endif %}
+
+        </table>
+        <div class="action-area"><button type="submit" class="btn btn-update">一括更新</button></div>
+
+        <h2>勤務記録 (records)</h2>
+        <table>
+            <tr><th style="width: 60px;">管理ID</th><th style="width: 150px;">社員ID</th><th>日付</th><th>開始</th><th>終了</th><th>合計(分)</th><th style="action-cell">操作</th></tr>
+            {% if records %}
+                {% for r in records %}
+                <tr>
+                    <td>{{ r[0] }}<input type="hidden" name="rec_id_list" value="{{ r[0] }}"></td>
+                    <td>
+                        <select name="rec_emp_{{ r[0] }}">
+                            {% for e in employees %}
+                                <option value="{{ e[0] }}" {% if e[0] == r[1] %}selected{% endif %}>
+                                    {{ e[1] }}(ID:{{ e[0] }})
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td><input type="text" name="rec_date_{{ r[0] }}" value="{{ r[2] }}"></td>
+                    <td><input type="text" name="rec_start_{{ r[0] }}" value="{{ r[3] }}"></td>
+                    <td><input type="text" name="rec_end_{{ r[0] }}" value="{{ r[4] }}"></td>
+                    <td><input type="number" name="rec_mins_{{ r[0] }}" value="{{ r[5] }}"></td>
+                    <td class="action-cell">
+                        <button type="button" class="btn btn-delete" onclick="if(confirm('削除しますか？')) { location.href='/delete_direct/records/{{ r[0] }}'; }">削除</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            {% else %}<tr><td colspan="7" class="empty-msg">このテーブルは空です。</td></tr>{% endif %}
+        </table>
+        <div class="action-area"><button type="submit" class="btn btn-update">一括更新</button></div>
+
+    </form>
+
+    <h2>システム設定 (settings)</h2>
+    <div class="table-wrapper">
+        <table>
+            <tr><th style="width: 60px;">管理ID</th><th>共通時給</th><th class="action-col">操作</th></tr>
+            {% if settings %}
+                {% for s in settings %}
+                <tr>
+                    <td>{{ s[0] }}</td>
+                    <td><form id="up-s-{{ s[0] }}" action="/update_db_all/settings/{{ s[0] }}" method="post"><input type="number" name="wage" value="{{ s[1] }}"></form></td>
+                    <td class="action-col">
+                        <div class="btn-box">
+                            <button type="submit" form="up-s-{{ s[0] }}" class="btn btn-update">更新</button>
+                            <form action="/delete_db_row/settings/{{ s[0] }}" method="post" onsubmit="return confirm('削除しますか？')"><button type="submit" class="btn btn-delete">削除</button></form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            {% else %}<tr><td colspan="3" class="empty-msg">このテーブルは空です。</td></tr>{% endif %}
+        </table>
+    </div>
+
+    <h2>ログインパスワード (auth)</h2>
+    <div class="table-wrapper">
+        <table>
+            <tr><th style="width: 60px;">管理ID</th><th>パスワード</th><th class="action-col">操作</th></tr>
+            {% if auths %}
+                {% for a in auths %}
+                <tr>
+                    <td>{{ a[0] }}</td>
+                    <td><form id="up-a-{{ a[0] }}" action="/update_db_all/auth/{{ a[0] }}" method="post"><input type="text" name="password" value="{{ a[1] }}"></form></td>
+                    <td class="action-col">
+                        <div class="btn-box">
+                            <button type="submit" form="up-a-{{ a[0] }}" class="btn btn-update">更新</button>
+                            <form action="/delete_db_row/auth/{{ a[0] }}" method="post" onsubmit="return confirm('削除しますか？')"><button type="submit" class="btn btn-delete">削除</button></form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            {% else %}<tr><td colspan="3" class="empty-msg">このテーブルは空です。</td></tr>{% endif %}
+        </table>
+    </div>
+
+    <a href="/login" class="back-link">← ログイン画面へ戻る</a>
+</div>
+
+</body>
+</html>

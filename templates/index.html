@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>スタッフ給与管理</title>
+    <style>
+        /* レイアウト設定 */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: sans-serif;
+            background-color: #7CCEF4;
+            margin: 0;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .main-wrapper {
+            display: flex;
+            width: 95%;
+            max-width: 1000px;
+            gap: 20px;
+            height: 85vh;
+            margin: auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            padding: 25px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .left-panel {
+            width: 350px;
+            flex-shrink: 0;
+        }
+
+        .right-panel {
+            flex-grow: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .card-title {
+            text-align: center;
+            color: #333;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+            border-bottom: 2px solid #7CCEF4;
+            padding-bottom: 10px;
+        }
+
+        h3 { margin-top: 0; color: #333; border-bottom: 2px solid #7CCEF4; padding-bottom: 8px; }
+
+        /* フォーム部品 */
+        .input-group { margin-bottom: 15px; width: 100%; display: flex; align-items: center; }
+        .input-group label { width: 60px; font-weight: bold; text-align: left; margin-right: 10px; color: #555; }
+        input {
+            padding: 10px;
+            flex: 1;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            background-color: #f9f9f9;
+        }
+        input[readonly] { background-color: #eee; color: #777; }
+
+        /* ボタンデザイン */
+        .btn-add { width: 100%; padding: 12px; background: #007bff; color: white; border: none; border-radius: 12px; cursor: pointer; font-size: 16px; font-weight: bold; }
+        .btn-update { background: #ffc107; color: #212529; }
+        .btn-nav { width: 100%; padding: 12px; background: #17a2b8; color: white; border: none; border-radius: 12px; cursor: pointer; font-size: 16px; font-weight: bold; }
+        .btn-all-delete { background: #6c757d; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; width: 100%; font-size: 14px; }
+
+        .btn-modern {
+            padding: 8px 15px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+        .btn-edit-link { background: #007bff; }
+        .btn-del-rec { background: #e74c3c; }
+
+        /* 下部ボタン群を寄せる */
+        .bottom-actions {
+            margin-top: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            text-align: center;
+        }
+
+        .logout-link { display: block; margin-top: 20px; color: #999; font-size: 14px; text-decoration: none; text-align: center; }
+
+        ul { list-style: none; padding: 0; margin: 0; }
+        li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+            gap: 15px;
+        }
+
+        .staff-name { text-decoration: none; color: #007bff; font-weight: bold; font-size: 18px; flex-grow: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .action-btns { display: flex; gap: 10px; }
+
+        .edit-msg { color: #856404; background-color: #fff3cd; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 14px; text-align: center; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="main-wrapper">
+        <div class="left-panel card">
+            <h2 class="card-title">給与管理システム</h2>
+
+            {% if edit_id %}<div class="edit-msg">※スタッフ名を修正してください。</div>{% endif %}
+
+            <form method="post" style="margin: 0;">
+                <div class="form-area">
+                    {% if not edit_id %}
+                    <div class="input-group">
+                        <label>時給</label>
+                        <input type="number" name="wage" value="{{ wage }}" readonly required>
+                    </div>
+                    {% endif %}
+
+                    <input type="hidden" name="target_id" value="{{ edit_id if edit_id else '' }}">
+
+                    <div class="input-group">
+                        <label>名前</label>
+                        <input name="name" value="{{ edit_name if edit_name else '' }}" required placeholder="スタッフ名を入力">
+                    </div>
+                </div>
+
+                <div class="bottom-actions" style="margin-top: 30px;">
+                    {% if edit_id %}
+                        <button type="submit" class="btn-add btn-update">保存</button>
+                        <a href="/" style="display:block; font-size:14px; color: #888; text-decoration: none;">キャンセル</a>
+                    {% else %}
+                        <button type="submit" class="btn-add">スタッフを追加</button>
+                    {% endif %}
+                </div>
+            </form>
+
+            {% if not edit_id %}
+                <div class="bottom-actions">
+                    <a href="/summary" style="text-decoration:none;"><button type="button" class="btn-nav">給与集計画面へ</button></a>
+
+                    <form action="/delete_all" method="post" onsubmit="return confirm('全てのスタッフを削除しますか？')" style="margin:0;">
+                        <button type="submit" class="btn-all-delete">全てのスタッフを削除</button>
+                    </form>
+
+                    <a href="/logout" class="logout-link">ログアウト</a>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="right-panel card">
+            <h3 class="card-title">スタッフ一覧</h3>
+            {% if not edit_id %}
+                {% if employees %}
+                    <ul>
+                    {% for e in employees %}
+                        <li>
+                            <a href="/work/{{ e[0] }}" class="staff-name">{{ e[1] }}</a>
+                            <div class="action-btns">
+                                <a href="/?edit_id={{ e[0] }}" class="btn-modern btn-edit-link">修正</a>
+                                <form action="/delete/{{ e[0] }}" method="post" style="margin: 0;">
+                                    <button type="submit" class="btn-modern btn-del-rec" onclick="return confirm('{{ e[1] }} さんを削除しますか？')">削除</button>
+                                </form>
+                            </div>
+                        </li>
+                    {% endfor %}
+                    </ul>
+                {% else %}
+                    <p style="color: #888; padding: 20px; text-align: center;">未登録です。</p>
+                {% endif %}
+            {% else %}
+                <div style="color: #999; text-align: center; margin-top: 100px;">
+                    左側のパネルで名前を修正してください。
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+</body>
+</html>
