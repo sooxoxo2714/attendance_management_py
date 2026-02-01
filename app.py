@@ -3,7 +3,7 @@ import sqlite3
 from datetime import datetime, timedelta
 
 app = Flask(__name__)
-app.secret_key = 'tHe_M4g1C_w0rds_r_hidden_1N_Y0ur_hE4rT'
+app.secret_key = '任意の暗号鍵を入れてね'
 
 DB = "attendance.db"
 
