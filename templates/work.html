@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>勤務入力 - スタッフ給与管理</title>
     <style>
-        /* 全体のレイアウト設定 */
         body {
             display: flex;
             justify-content: center;
@@ -26,7 +25,6 @@
             margin: auto;
         }
 
-        /* 共通のボックスデザイン */
         .card {
             background: white;
             border-radius: 15px;
@@ -43,14 +41,12 @@
             flex-shrink: 0;
         }
 
-        /* 右側：履歴一覧（縦スクロール対応） */
         .right-panel {
             flex-grow: 1;
             overflow-y: auto;
             overflow-x: hidden;
         }
 
-        /* ボックス内のタイトル */
         .card-title {
             text-align: center;
             color: #333;
@@ -63,7 +59,6 @@
 
         h3 { margin-top: 0; color: #333; border-bottom: 2px solid #7CCEF4; padding-bottom: 8px; }
 
-        /* フォーム部品 */
         .input-group { margin-bottom: 15px; width: 100%; display: flex; align-items: center; }
         .input-group label { width: 60px; font-weight: bold; text-align: left; margin-right: 10px; color: #555; }
         input {
@@ -75,12 +70,10 @@
             background-color: #f9f9f9;
         }
 
-        /* ボタンデザイン */
         .btn-add { width: 100%; padding: 12px; background: #28a745; color: white; border: none; border-radius: 12px; cursor: pointer; font-size: 16px; font-weight: bold; }
         .btn-update { background: #ffc107; color: #212529; }
         .btn-back { width: 100%; padding: 12px; background: #6c757d; color: white; border: none; border-radius: 12px; cursor: pointer; font-size: 14px; font-weight: bold; text-decoration: none; text-align: center; display: block; box-sizing: border-box; }
 
-        /* ボックス下部に寄せるためのコンテナ */
         .bottom-actions {
             margin-top: auto;
             display: flex;
@@ -93,7 +86,6 @@
         .month-filter label { font-weight: bold; color: #555; }
         .month-filter input { max-width: 150px; }
 
-        /* リスト表示 */
         ul { list-style: none; padding: 0; margin: 0; }
         li {
             display: flex;
