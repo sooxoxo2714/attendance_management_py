@@ -1,6 +1,6 @@
 # ファイル内容
 `README.md`と`LICENSE`は無視していいです。  
-**app.py**, **templates**の2つが本体です。  
+`app.py`, `templates`の2つが本体です。  
 # 使う前に
 Flaskを用いて、Pythonanywhere上で動かしてたのでダウンロードするだけだと使えないかもしれません。  
 開発環境:Windows 11 Home (64bit), Python 3.13.5  
