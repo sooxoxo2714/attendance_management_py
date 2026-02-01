@@ -1,5 +1,5 @@
 # ファイル内容
-**README** と**LICENSE**は無視していいです。  
+**README**と**LICENSE**は無視していいです。  
 **app.py**, **templates**の2つが本体です。  
 # 使う前に
 Flaskを用いて、Pythonanywhere上で動かしてたのでダウンロードするだけだと使えないかもしれません。  
